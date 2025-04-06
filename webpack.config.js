@@ -6,15 +6,10 @@ const {
   swcDefaultsFactory,
 } = require('@nestjs/cli/lib/compiler/defaults/swc-defaults');
 
-// Create the default SWC options and then override the cli options
 const defaultSwcConfig = swcDefaultsFactory();
-defaultSwcConfig.cliOptions.stripLeadingPaths = false; // Preserve folder structure
-// Optionally, set the output directory if needed:
+defaultSwcConfig.cliOptions.stripLeadingPaths = false;
 defaultSwcConfig.cliOptions.outDir = './dist';
 
-// Dynamically generate entry points from your source folder.
-// Change './src/**/*.ts' to your project's source folder path,
-// for example './apps/admin-api/src/**/*.ts' or './libs/libs/**/*.ts'
 const entries = glob.sync('./**/*.ts').reduce((acc, filePath) => {
   // Compute a relative entry name without the .ts extension.
   const entryName = path.relative('./src', filePath).replace(/\.ts$/, '');
@@ -22,8 +17,6 @@ const entries = glob.sync('./**/*.ts').reduce((acc, filePath) => {
   acc[entryName] = path.resolve(__dirname, filePath);
   return acc;
 }, {});
-
-console.log('Webpack entries:', entries);
 
 module.exports = {
   target: 'node',

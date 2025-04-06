@@ -19,9 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@app/libs": ["libs/libs"],
-      "@app/libs/*": ["libs/libs/*"],
-      "@app/shared": ["libs/shared/src"],
-      "@app/shared/*": ["libs/shared/src/*"]
+      "@app/libs/*": ["libs/libs/*"]
     }
   }
 }
