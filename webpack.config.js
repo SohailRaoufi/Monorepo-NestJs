@@ -1,20 +1,29 @@
 const path = require('path');
 const glob = require('glob');
 const nodeExternals = require('webpack-node-externals');
-// Get the default SWC configuration from Nest CLI
 const {
   swcDefaultsFactory,
 } = require('@nestjs/cli/lib/compiler/defaults/swc-defaults');
 
+// Get Nest’s default SWC options and override if needed.
 const defaultSwcConfig = swcDefaultsFactory();
 defaultSwcConfig.cliOptions.stripLeadingPaths = false;
-defaultSwcConfig.cliOptions.outDir = './dist';
 
-const entries = glob.sync('./**/*.ts').reduce((acc, filePath) => {
-  // Compute a relative entry name without the .ts extension.
-  const entryName = path.relative('./src', filePath).replace(/\.ts$/, '');
-  // Resolve to an absolute path.
-  acc[entryName] = path.resolve(__dirname, filePath);
+// Find all TypeScript files in both "apps" and "libs", ignoring test files if needed.
+const entryFiles = glob.sync('./{apps,libs}/**/*.ts', {
+  ignore: ['./**/*.spec.ts'], // adjust this pattern as needed
+});
+
+// For each file, compute an entry key that removes the "/src/" segment.
+// For example, "apps/admin-api/src/main.ts" becomes "apps/admin-api/main"
+const entries = entryFiles.reduce((acc, filePath) => {
+  // Get the relative path from the monorepo root
+  let relativePath = path.relative('.', filePath); // e.g. "apps/admin-api/src/main.ts"
+  // Remove the "/src/" part so the output mimics tsc's output
+  relativePath = relativePath.replace(/\/src\//, '/');
+  // Remove the extension
+  const entryKey = relativePath.replace(/\.ts$/, '');
+  acc[entryKey] = path.resolve(__dirname, filePath);
   return acc;
 }, {});
 
@@ -23,17 +32,19 @@ module.exports = {
   mode: process.env.NODE_ENV || 'development',
   entry: entries,
   output: {
-    // Output will mirror the folder structure from your source,
-    // for example, if entryName is "folder/file", the output will be "dist/folder/file.js".
+    // All compiled files will go to "dist" preserving the folder structure.
+    // For example, "apps/admin-api/src/main.ts" becomes "dist/apps/admin-api/main.js"
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     libraryTarget: 'commonjs2',
   },
-  externals: [nodeExternals()], // Exclude node_modules from bundling
+  externals: [nodeExternals()], // Keep node_modules external
   resolve: {
     extensions: ['.ts', '.js'],
-    // You can also add any alias mappings here if needed
+    // You can add alias mappings if needed (for example, if you use path aliases in tsconfig)
     alias: {
+      // Example: if your tsconfig has:
+      // "paths": { "@app/libs": ["libs/libs"] }
       '@app/libs': path.resolve(__dirname, 'libs/libs'),
       '@app/shared': path.resolve(__dirname, 'libs/shared/src'),
     },
@@ -43,10 +54,8 @@ module.exports = {
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'swc-loader',
-          options: defaultSwcConfig.swcOptions, // Use the Nest CLI default SWC options with our overrides
-        },
+        loader: 'swc-loader',
+        options: defaultSwcConfig.swcOptions,
       },
     ],
   },

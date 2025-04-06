@@ -6,10 +6,9 @@ import {
   PostgreSqlDriver,
 } from '@mikro-orm/postgresql';
 
-console.log(__dirname);
-
 export const databaseConfig: Options = {
-  autoLoadEntities: true,
+  entities: ['./dist/libs/libs/entities'],
+  entitiesTs: ['../entities'],
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   user: process.env.DB_USER,
