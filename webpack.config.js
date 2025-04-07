@@ -9,7 +9,7 @@ const {
 const defaultSwcConfig = swcDefaultsFactory();
 defaultSwcConfig.cliOptions.stripLeadingPaths = false;
 
-const entryFiles = glob.sync('./{apps,libs}/**/*.ts', {
+const entryFiles = glob.sync('./{apps,libs,database}/**/*.ts', {
   ignore: ['./**/*.spec.ts'],
 });
 
@@ -30,6 +30,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     libraryTarget: 'commonjs2',
+    clean: true,
   },
   externals: [nodeExternals()],
   resolve: {

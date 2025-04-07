@@ -9,12 +9,6 @@
     "builder": "webpack",
     "tsConfigPath": "apps/admin-api/tsconfig.app.json"
   },
-  "assets": [
-    {
-      "watchAssets": true,
-      "outDir": "dist/src"
-    }
-  ],
   "monorepo": true,
   "root": "apps/admin-api",
   "projects": {
