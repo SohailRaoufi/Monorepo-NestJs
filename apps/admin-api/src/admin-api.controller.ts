@@ -6,7 +6,7 @@ export class AdminApiController {
   constructor(private readonly adminApiService: AdminApiService) {}
 
   @Get()
-  getHello(): string {
-    return this.adminApiService.getHello();
+  async getHello() {
+    return await this.adminApiService.getHello();
   }
 }

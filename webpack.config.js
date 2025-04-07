@@ -5,7 +5,6 @@ const nodeExternals = require('webpack-node-externals');
 const {
   swcDefaultsFactory,
 } = require('@nestjs/cli/lib/compiler/defaults/swc-defaults');
-const { plugins } = require('@swc/core');
 
 const defaultSwcConfig = swcDefaultsFactory();
 defaultSwcConfig.cliOptions.stripLeadingPaths = false;
